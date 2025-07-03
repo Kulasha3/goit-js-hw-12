@@ -57,6 +57,8 @@ async function onLoadBtnClick() {
   refs.loader.classList.remove('hidden');
   const data = await searchImg(search, page);
   imgRender(data);
+  gallery.on('show.simplelightbox');
+  gallery.refresh();
   refs.loader.classList.add('hidden');
   checkBtnVisibleStatus();
   const height =
