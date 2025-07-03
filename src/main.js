@@ -14,7 +14,7 @@ import {
 } from './js/render-functions';
 
 const refs = {
-  formEl: document.querySelector('.search-form'),
+  formEl: document.querySelector('.form'),
   galleryForm: document.querySelector('.gallery'),
   loadBtn: document.querySelector('.more'),
 };
