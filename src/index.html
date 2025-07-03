@@ -11,11 +11,15 @@
     <form class="search-form">
       <input type="text" name="text" />
 
-      <button type="submit">Search</button>
+      <button class="btn" type="submit">Search</button>
     </form>
+
     <div>
       <ul class="gallery"></ul>
-      <span class="loader"></span>
+    </div>
+    <div class="load-more">
+      <button type="button" class="btn more hidden">Load more</button>
+      <span class="loader hidden"></span>
     </div>
 
     <script type="module" src="./main.js"></script>

@@ -29,6 +29,14 @@ export function errNotify(err) {
   });
 }
 
+export function infoNotify() {
+  iziToast.info({
+    title: 'Info',
+    message: "We're sorry, but you've reached the end of search results.",
+    position: 'topRight',
+  });
+}
+
 export function imgTemplate(data) {
   return data.hits
     .map(
@@ -64,7 +72,7 @@ export function imgTemplate(data) {
 
 export function imgRender(data) {
   const markup = imgTemplate(data);
-  refs.galleryEl.innerHTML = markup;
+  refs.galleryForm.insertAdjacentHTML('beforeend', markup);
 }
 
 export let gallery = new SimpleLightbox('.gallery a', {
