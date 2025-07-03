@@ -2,8 +2,79 @@ import iziToast from 'izitoast';
 import 'izitoast/dist/css/iziToast.min.css';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
-import { refs } from '../main';
 
+// Создаем экземпляр SimpleLightbox
+export let gallery = new SimpleLightbox('.gallery a', {
+  captionsData: 'alt',
+  captionPosition: 'bottom',
+  captionDelay: 250,
+});
+
+// Получаем ссылки на DOM элементы
+const refs = {
+  galleryForm: document.querySelector('.gallery'),
+  loader: document.querySelector('.loader'),
+  loadBtn: document.querySelector('.more'),
+};
+
+// Обязательные функции согласно ТЗ
+export function createGallery(images) {
+  const markup = images.hits
+    .map(
+      ({
+        webformatURL,
+        largeImageURL,
+        tags,
+        likes,
+        views,
+        comments,
+        downloads,
+      }) => {
+        return `<li class="gallery-item">
+  <a class="gallery-link" href="${largeImageURL}">
+    <img
+      class="gallery-image"
+      src="${webformatURL}"
+      alt="${tags}"
+      loading="lazy"
+    />
+  </a>
+  <div class="gallery-descr">
+  <p><b>Likes</b> ${likes}</p>
+  <p><b>Views</b> ${views}</p>
+  <p><b>Comments</b> ${comments}</p>
+  <p><b>Downloads</b> ${downloads}</p>
+ </div>
+</li>`;
+      }
+    )
+    .join('\n');
+  
+  refs.galleryForm.insertAdjacentHTML('beforeend', markup);
+  gallery.refresh();
+}
+
+export function clearGallery() {
+  refs.galleryForm.innerHTML = '';
+}
+
+export function showLoader() {
+  refs.loader.classList.remove('hidden');
+}
+
+export function hideLoader() {
+  refs.loader.classList.add('hidden');
+}
+
+export function showLoadMoreButton() {
+  refs.loadBtn.classList.remove('hidden');
+}
+
+export function hideLoadMoreButton() {
+  refs.loadBtn.classList.add('hidden');
+}
+
+// Дополнительные функции для уведомлений
 export function checkUp() {
   iziToast.warning({
     title: 'Caution',
@@ -36,47 +107,3 @@ export function infoNotify() {
     position: 'topRight',
   });
 }
-
-export function imgTemplate(data) {
-  return data.hits
-    .map(
-      ({
-        webformatURL,
-        largeImageURL,
-        tags,
-        likes,
-        views,
-        comments,
-        downloads,
-      }) => {
-        return `<li class="gallery-item">
-  <a class="gallery-link" href="${largeImageURL}">
-    <img
-      class="gallery-image"
-      src="${webformatURL}"
-      alt="${tags}"
-      loading="lazy"
-    />
-  </a>
-  <div class="gallery-descr">
-  <p><b>Likes</b> ${likes}</p>
-  <p><b>Views</b> ${views}</p>
-  <p><b>Comments</b> ${comments}</p>
-  <p><b>Downloads</b> ${downloads}</p>
- </div>
-</li>`;
-      }
-    )
-    .join('\n');
-}
-
-export function imgRender(data) {
-  const markup = imgTemplate(data);
-  refs.galleryForm.insertAdjacentHTML('beforeend', markup);
-}
-
-export let gallery = new SimpleLightbox('.gallery a', {
-  captionsData: 'alt',
-  captionPosition: 'bottom',
-  captionDelay: 250,
-});

@@ -1,15 +1,21 @@
-import { searchImg } from './js/pixabay-api';
-import { checkUp, noMatch } from './js/render-functions';
-import { imgRender } from './js/render-functions';
-import { gallery } from './js/render-functions';
-import { errNotify } from './js/render-functions';
-import { infoNotify } from './js/render-functions';
+import { getImagesByQuery } from './js/pixabay-api';
+import { 
+  createGallery, 
+  clearGallery, 
+  showLoader, 
+  hideLoader, 
+  showLoadMoreButton, 
+  hideLoadMoreButton,
+  checkUp, 
+  noMatch, 
+  errNotify, 
+  infoNotify,
+  gallery 
+} from './js/render-functions';
 
-export const refs = {
+const refs = {
   formEl: document.querySelector('.search-form'),
   galleryForm: document.querySelector('.gallery'),
-  galleryEl: document.querySelector('.gallery-item'),
-  loader: document.querySelector('.loader'),
   loadBtn: document.querySelector('.more'),
 };
 
@@ -30,58 +36,58 @@ async function onFormSubmit(e) {
     return;
   }
 
-  refs.loader.classList.remove('hidden');
+  hideLoadMoreButton();
+  showLoader();
+  clearGallery();
 
   try {
-    const data = await searchImg(search, page);
+    const data = await getImagesByQuery(search, page);
 
     if (data.hits.length === 0) {
       noMatch();
+      hideLoader();
+      return;
     }
-    resultPages = Math.ceil(data.totalHits / 15);
-    refs.galleryForm.innerHTML = '';
 
-    imgRender(data);
-    gallery.on('show.simplelightbox');
-    gallery.refresh();
+    resultPages = Math.ceil(data.totalHits / 15);
+    createGallery(data);
+    
+    if (page < resultPages) {
+      showLoadMoreButton();
+    }
+    
   } catch (err) {
     errNotify(err);
   }
-  refs.loader.classList.add('hidden');
-  checkBtnVisibleStatus();
+  
+  hideLoader();
   e.target.reset();
 }
 
 async function onLoadBtnClick() {
   page += 1;
-  refs.loader.classList.remove('hidden');
-  const data = await searchImg(search, page);
-  imgRender(data);
-  gallery.on('show.simplelightbox');
-  gallery.refresh();
-  refs.loader.classList.add('hidden');
-  checkBtnVisibleStatus();
-  const height =
-    refs.galleryForm.firstElementChild.getBoundingClientRect().height;
+  showLoader();
+  
+  try {
+    const data = await getImagesByQuery(search, page);
+    createGallery(data);
+    
+    // Плавное прокручивание
+    const height = refs.galleryForm.firstElementChild.getBoundingClientRect().height;
+    scrollBy({
+      behavior: 'smooth',
+      top: height * 2,
+    });
 
-  scrollBy({
-    behavior: 'smooth',
-    top: height * 2,
-  });
-}
-
-function showLoadBtn() {
-  refs.loadBtn.classList.remove('hidden');
-}
-function hideLoadBtn() {
-  refs.loadBtn.classList.add('hidden');
-}
-
-function checkBtnVisibleStatus() {
-  if (page >= resultPages) {
-    hideLoadBtn();
-    infoNotify();
-  } else {
-    showLoadBtn();
+    // Проверяем, достигли ли конца
+    if (page >= resultPages) {
+      hideLoadMoreButton();
+      infoNotify();
+    }
+    
+  } catch (err) {
+    errNotify(err);
   }
+  
+  hideLoader();
 }
